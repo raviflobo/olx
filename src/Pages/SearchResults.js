@@ -1,137 +1,97 @@
-import React, { useState, useEffect, useCallback, useContext } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import Layout from '../Components/Layout/Layout';
-import AdvancedSearch from '../Components/Search/AdvancedSearch';
-import { Firebase } from '../firebase/config';
-import { AuthContext } from '../contextStore/AuthContext';
-import { addRecentSearch } from '../utils/recentSearches';
+import CarCard from '../Components/UI/CarCard';
+import SkeletonCard from '../Components/UI/SkeletonCard';
+import EmptyState from '../Components/UI/EmptyState';
+import { fetchPublicCars } from '../utils/fetchPublicCars';
+import { filterCars } from '../utils/carFilters';
+import './SearchResults.css';
 
-function getInitialFilters(search) {
-  const p = new URLSearchParams(search);
-  const filters = {};
-  if (p.get('category')) filters.category = p.get('category');
-  if (p.get('subcategory')) filters.subcategory = p.get('subcategory');
-  if (p.get('minPrice') !== null && p.get('minPrice') !== '')
-    filters.minPrice = p.get('minPrice');
-  if (p.get('maxPrice') !== null && p.get('maxPrice') !== '')
-    filters.maxPrice = p.get('maxPrice');
-  if (p.get('state')) filters.state = p.get('state');
-  if (p.get('city')) filters.city = p.get('city');
-  if (p.get('condition')) filters.condition = p.get('condition');
-  if (p.get('datePosted')) filters.datePosted = p.get('datePosted');
-  if (p.get('adType')) filters.adType = p.get('adType');
-  if (p.get('deliveryAvailable') === 'true') filters.deliveryAvailable = true;
-  if (p.get('warrantyAvailable') === 'true') filters.warrantyAvailable = true;
-  if (p.get('verifiedSeller') === 'true') filters.verifiedSeller = true;
-  if (p.get('sort')) filters.sort = p.get('sort');
-  return filters;
+function useQuery() {
+  return new URLSearchParams(useLocation().search);
 }
 
-function buildSearchString(query, filters, sort) {
-  const p = new URLSearchParams();
-  if (query) p.set('q', query);
-  if (filters?.category) p.set('category', filters.category);
-  if (filters?.subcategory) p.set('subcategory', filters.subcategory);
-  if (filters?.minPrice !== null && filters?.minPrice !== undefined && filters.minPrice !== '')
-    p.set('minPrice', filters.minPrice);
-  if (filters?.maxPrice !== null && filters?.maxPrice !== undefined && filters.maxPrice !== '')
-    p.set('maxPrice', filters.maxPrice);
-  if (filters?.state) p.set('state', filters.state);
-  if (filters?.city) p.set('city', filters.city);
-  if (filters?.condition) p.set('condition', filters.condition);
-  if (filters?.datePosted) p.set('datePosted', filters.datePosted);
-  if (filters?.adType) p.set('adType', filters.adType);
-  if (filters?.deliveryAvailable) p.set('deliveryAvailable', 'true');
-  if (filters?.warrantyAvailable) p.set('warrantyAvailable', 'true');
-  if (filters?.verifiedSeller) p.set('verifiedSeller', 'true');
-  if (sort && sort !== 'newest') p.set('sort', sort);
-  return p.toString();
-}
-
-function SearchResultsPage() {
-  const location = useLocation();
+function SearchResults() {
+  const query = useQuery();
   const history = useHistory();
-  const { user } = useContext(AuthContext);
-  const queryParams = new URLSearchParams(location.search);
-  const q = queryParams.get('q') || '';
-  const initialFilters = React.useMemo(
-    () => getInitialFilters(location.search),
-    [location.search]
-  );
-  const [products, setProducts] = useState([]);
+  const q = query.get('q') || '';
+  const [searchInput, setSearchInput] = useState(q);
+  const [cars, setCars] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const syncUrl = useCallback(
-    (filters, sort) => {
-      const search = buildSearchString(q, filters, sort);
-      const newPath = search
-        ? `${location.pathname}?${search}`
-        : location.pathname;
-      if (newPath !== location.pathname + (location.search || '')) {
-        history.replace(newPath);
-      }
-    },
-    [q, location.pathname, location.search, history]
-  );
-
-  const handleFiltersChange = useCallback(
-    (filters, sort) => {
-      syncUrl(filters, sort || 'newest');
-    },
-    [syncUrl]
-  );
-
-  const handleSortChange = useCallback(
-    (sort, filters) => {
-      syncUrl(filters || initialFilters, sort);
-    },
-    [syncUrl, initialFilters]
-  );
-
   useEffect(() => {
-    if (q?.trim()) addRecentSearch(q, user?.uid);
-  }, [q, user]);
+    setSearchInput(q);
+  }, [q]);
 
   useEffect(() => {
     setLoading(true);
-    Firebase.firestore()
-      .collection('products')
-      .where('status', '==', 'active')
-      .orderBy('createdAt', 'desc')
-      .get()
-      .then((snapshot) => {
-        const list = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setProducts(list);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
+    fetchPublicCars()
+      .then(setCars)
+      .catch(() => setCars([]))
+      .finally(() => setLoading(false));
   }, []);
 
-  const handleVoiceResult = useCallback(
-    (text) => {
-      if (text?.trim()) {
-        history.push(`/search?q=${encodeURIComponent(text.trim())}`);
-      }
-    },
-    [history]
+  const filtered = useMemo(
+    () => filterCars(cars, { search: q }),
+    [cars, q]
   );
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    const term = searchInput.trim();
+    history.push(term ? `/search?q=${encodeURIComponent(term)}` : '/search');
+  };
 
   return (
     <Layout>
-      <AdvancedSearch
-        products={products}
-        loading={loading}
-        query={q}
-        filters={initialFilters}
-        onFiltersChange={handleFiltersChange}
-        onSortChange={handleSortChange}
-        onVoiceResult={handleVoiceResult}
-      />
+      <div className="cs-page search-page cs-page--flush-top">
+        <div className="cs-container">
+          <div className="search-page__head">
+            <h1 className="search-page__title">Search</h1>
+            {q && <p className="search-page__query">&ldquo;{q}&rdquo;</p>}
+          </div>
+
+          <form className="search-page__form" onSubmit={handleSearch}>
+            <input
+              className="cs-input search-page__input"
+              type="search"
+              placeholder="Search cars…"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+            />
+            <button type="submit" className="cs-btn cs-btn--primary">
+              Search
+            </button>
+          </form>
+
+          <p className="search-page__count">
+            {!loading && `${filtered.length} car${filtered.length !== 1 ? 's' : ''} found`}
+          </p>
+
+          {loading && (
+            <div className="cs-car-grid">
+              {[1, 2, 3, 4].map((i) => (
+                <SkeletonCard key={i} />
+              ))}
+            </div>
+          )}
+
+          {!loading && filtered.length === 0 && (
+            <EmptyState title="No results" text="Try a different search term." />
+          )}
+
+          {!loading && filtered.length > 0 && (
+            <div className="cs-car-grid">
+              {filtered.map((car) => (
+                <CarCard key={car.id} car={car} />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
     </Layout>
   );
 }
 
-export default SearchResultsPage;
+export default SearchResults;

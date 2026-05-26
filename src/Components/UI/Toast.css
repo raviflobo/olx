@@ -11,23 +11,23 @@
 
 .toast {
   padding: 12px 16px;
-  border-radius: 8px;
-  background: #002f34;
+  border-radius: var(--olx-radius-md);
+  background: var(--olx-primary);
   color: #fff;
   font-size: 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--olx-card-shadow);
 }
 
 .toast_success {
-  background: #2e7d32;
+  background: #059669;
 }
 
 .toast_error {
-  background: #c62828;
+  background: var(--olx-error);
 }
 
 .toastClose {

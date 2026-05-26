@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import './App.css';
+import './styles/caronsell.css';
 import ContextAuth, { AuthContext } from './contextStore/AuthContext';
 import AppProviders from './contextStore/AppProviders';
 import MainRoutes from './Routes/MainRoutes';

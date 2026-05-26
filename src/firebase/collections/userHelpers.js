@@ -1,29 +1,14 @@
 /**
- * User collection helpers.
+ * CARONSELL user helpers (dealers).
  */
-import {
-  DEFAULT_USER_LOCATION,
-  DEFAULT_USER_BUSINESS_INFO,
-  DEFAULT_USER_SOCIAL_LINKS,
-  DEFAULT_USER_PRIVACY_SETTINGS,
-} from '../schema';
-import { usersRef } from './refs';
+import { getUserRef } from './refs';
+import { syncDealerToListings } from './productHelpers';
 import { serverTimestamp } from './fieldValues';
 
-export const getUserRef = (userId) => usersRef().doc(userId);
-export const getUserByAuthId = (authId) =>
-  usersRef().where('id', '==', authId).limit(1);
-
-/**
- * @param {{ premiumMember?: boolean, premiumExpiry?: FirebaseFirestore.Timestamp | null }} data - User doc or snapshot data
- * @returns {boolean} True if user has an active paid plan
- */
-export function isPremiumUser(data) {
-  if (!data?.premiumMember) return false;
-  const expiry = data.premiumExpiry;
-  if (expiry == null) return true;
-  const expiryDate = typeof expiry.toDate === 'function' ? expiry.toDate() : new Date(expiry);
-  return expiryDate > new Date();
+export async function getUserDoc(userId) {
+  const snap = await getUserRef(userId).get();
+  if (!snap.exists) return null;
+  return { id: snap.id, ...snap.data() };
 }
 
 export async function ensureUserDoc(authUser, extras = {}) {
@@ -37,50 +22,38 @@ export async function ensureUserDoc(authUser, extras = {}) {
       extras.name != null
         ? String(extras.name).trim()
         : authUser.displayName || authUser.email?.split('@')[0] || 'User',
-    phone: extras.phone != null ? String(extras.phone).trim() : '',
-    email: authUser.email || extras.email || '',
-    alternatePhone: '',
-    dateOfBirth: null,
-    gender: '',
-    avatar: authUser.photoURL || extras.avatar || '',
-    coverPhoto: '',
-    about: '',
-    languages: '',
-    website: '',
-    location: DEFAULT_USER_LOCATION(),
-    businessInfo: DEFAULT_USER_BUSINESS_INFO(),
-    socialLinks: DEFAULT_USER_SOCIAL_LINKS(),
-    verified: false,
-    emailVerified: authUser.emailVerified || false,
-    phoneVerified: false,
-    idVerified: false,
-    addressVerified: false,
-    kycStatus: 'not_started',
-    trustScore: 0,
-    badgeLevel: 'new',
-    ratingSum: 0,
-    ratingCount: 0,
-    responseRate: 0,
-    responseTime: '',
-    totalAdsPosted: 0,
-    totalAdsSold: 0,
-    totalActiveAds: 0,
-    followersCount: 0,
-    followingCount: 0,
-    accountStatus: 'active',
-    role: 'user',
-    isOnline: false,
-    lastSeen: null,
-    premiumMember: false,
-    premiumExpiry: null,
-    referralCode: '',
-    referredBy: '',
-    preferredLanguage: 'en',
-    currency: 'INR',
-    privacySettings: DEFAULT_USER_PRIVACY_SETTINGS(),
-    savedAds: [],
-    watchlist: [],
-    memberSince: now,
+    email: authUser.email || '',
+    avatar: authUser.photoURL || '',
+    createdAt: now,
     updatedAt: now,
   });
+}
+
+export async function saveDealerProfile(userId, data) {
+  const now = serverTimestamp();
+  await getUserRef(userId).set(
+    {
+      role: 'dealer',
+      name: (data.name || '').trim(),
+      dealershipName: (data.dealershipName || '').trim(),
+      city: (data.city || '').trim(),
+      whatsappNumber: (data.whatsappNumber || '').trim(),
+      updatedAt: now,
+    },
+    { merge: true }
+  );
+}
+
+export async function updateDealerProfile(userId, data) {
+  const now = serverTimestamp();
+  const profile = {
+    dealershipName: (data.dealershipName || '').trim(),
+    city: (data.city || '').trim(),
+    whatsappNumber: (data.whatsappNumber || '').trim(),
+    name: (data.name || '').trim(),
+    updatedAt: now,
+  };
+  await getUserRef(userId).update(profile);
+  const count = await syncDealerToListings(userId, profile);
+  return count;
 }

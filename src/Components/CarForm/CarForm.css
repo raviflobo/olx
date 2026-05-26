@@ -1,0 +1,179 @@
+.car-form {
+  background: var(--olx-surface);
+  border-radius: var(--olx-radius-md);
+  padding: 1.5rem;
+  box-shadow: var(--olx-card-shadow);
+}
+
+.car-form__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0 1rem;
+}
+
+@media (min-width: 768px) {
+  .car-form__grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.car-form__photos-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.car-form__photos-header .cs-section-title {
+  margin: 0;
+}
+
+.car-form__photo-count {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--olx-text-muted);
+  background: var(--olx-bg);
+  padding: 0.25rem 0.625rem;
+  border-radius: 999px;
+}
+
+.car-form__bulk-urls {
+  margin-bottom: 0.75rem;
+  font-family: inherit;
+  font-size: 0.875rem;
+}
+
+.car-form__url-actions {
+  margin-bottom: 1rem;
+}
+
+.car-form__file-upload {
+  display: inline-flex;
+  margin-bottom: 1rem;
+  cursor: pointer;
+  width: auto;
+}
+
+.car-form__photos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.car-form__cover-badge {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  z-index: 2;
+  font-size: 0.625rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  background: var(--olx-highlight);
+  color: var(--olx-primary);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.car-form__photo-num {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  z-index: 2;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  padding: 2px 5px;
+  border-radius: 4px;
+}
+
+.car-form__photo--file .car-form__file-name {
+  font-size: 0.65rem;
+  padding: 0.25rem;
+  word-break: break-all;
+}
+
+.car-form__photo {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  border-radius: var(--olx-radius-sm);
+  overflow: hidden;
+  border: 1px solid var(--olx-border);
+}
+
+.car-form__photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.car-form__photo button,
+.car-form__photo--new button {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  cursor: pointer;
+}
+
+.car-form__photo-add {
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px dashed var(--olx-border);
+  border-radius: var(--olx-radius-sm);
+  cursor: pointer;
+  font-size: 0.8125rem;
+  color: var(--olx-text-muted);
+  text-align: center;
+}
+
+.car-form__photo--new {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  font-size: 0.75rem;
+  background: var(--olx-bg);
+}
+
+.car-form__active {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1rem 0;
+  font-size: 0.9375rem;
+}
+
+.car-form__storage-hint {
+  font-size: 0.875rem;
+  color: var(--olx-text-muted);
+  margin: 0 0 1rem;
+  line-height: 1.5;
+}
+
+.car-form__url-row {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.car-form__url-row .cs-input {
+  flex: 1;
+  min-width: 200px;
+}
+
+.car-form__actions {
+  margin-top: 1.5rem;
+}

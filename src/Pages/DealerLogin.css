@@ -1,0 +1,56 @@
+.dealer-login-card__logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.dealer-login-card__title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-align: center;
+  margin: 0 0 0.25rem;
+}
+
+.dealer-login-card__sub {
+  text-align: center;
+  color: var(--olx-text-muted);
+  margin: 0 0 1.5rem;
+}
+
+.dealer-login-card__forgot {
+  display: block;
+  text-align: right;
+  font-size: 0.875rem;
+  color: var(--olx-text-muted);
+  margin: -0.5rem 0 1rem;
+  text-decoration: none;
+}
+
+.dealer-login-card__forgot:hover {
+  color: var(--olx-primary);
+}
+
+.dealer-login-card__google {
+  margin-top: 0.75rem;
+}
+
+.dealer-login-card__toggle {
+  display: block;
+  width: 100%;
+  margin-top: 1rem;
+  background: none;
+  border: none;
+  color: var(--olx-primary);
+  font-size: 0.875rem;
+  cursor: pointer;
+  text-align: center;
+}
+
+.dealer-login-card__back {
+  display: block;
+  text-align: center;
+  margin-top: 1.5rem;
+  color: var(--olx-text-muted);
+  font-size: 0.875rem;
+  text-decoration: none;
+}

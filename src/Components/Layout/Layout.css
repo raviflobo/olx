@@ -1,6 +1,6 @@
 .appMain {
-  padding-top: 64px;
-  min-height: calc(100vh - 64px);
+  padding-top: var(--app-header-height);
+  min-height: calc(100vh - var(--app-header-height));
 }
 
 .appMainNoHeader {
@@ -9,7 +9,7 @@
 
 @media (max-width: 768px) {
   .appMain {
-    padding-bottom: 88px; /* 60px nav + 22px sell button overshoot + 6px breathing room */
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
   }
   .appMainNoHeader,
   .appMainNoMobileNav {

@@ -1,0 +1,30 @@
+.cs-skeleton-card {
+  background: var(--olx-surface);
+  border-radius: var(--olx-radius-md);
+  overflow: hidden;
+  box-shadow: var(--olx-card-shadow);
+}
+
+.cs-skeleton-card__image {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: 0;
+}
+
+.cs-skeleton-card__body {
+  padding: 1rem;
+}
+
+.cs-skeleton-card__line {
+  height: 14px;
+  margin-bottom: 0.5rem;
+}
+
+.cs-skeleton-card__line--short {
+  width: 40%;
+}
+
+.cs-skeleton-card__line--meta {
+  width: 70%;
+  height: 12px;
+}

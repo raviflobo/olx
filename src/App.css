@@ -1,27 +1,49 @@
-/* Global responsive and base styles – OLX India (olx.in) exact clone */
+/* CARONSELL global styles */
 :root {
-  --olx-primary: #002f34;
-  --olx-primary-hover: #00464d;
-  --olx-accent: #23e5db;
-  --olx-highlight: #ffce32;
-  --olx-cta: #3a77ff;
-  --olx-error: #c62828;
-  --olx-bg: #ebeeef;
-  --olx-bg-light: #f7f9f9;
-  --olx-text: #002f34;
-  --olx-text-muted: #7f9799;
-  --olx-border: #e7e9e9;
-  --olx-card-shadow: 0 2px 4px rgba(0, 47, 52, 0.08);
+  --olx-primary: #1a1a2e;
+  --olx-primary-hover: #2d2d44;
+  --olx-accent: #e8c547;
+  --olx-highlight: #e8c547;
+  --olx-cta: #e8c547;
+  --caronsell-whatsapp: #25d366;
+  --olx-error: #dc2626;
+  --olx-bg: #f5f5f5;
+  --olx-bg-light: #ffffff;
+  --olx-surface: #ffffff;
+  --olx-text: #1a1a2e;
+  --olx-text-muted: #6b7280;
+  --olx-border: #e5e7eb;
+  --olx-card-shadow: 0 1px 3px rgba(26, 26, 46, 0.08),
+    0 4px 12px rgba(26, 26, 46, 0.06);
   --olx-touch-min: 44px;
-  --olx-radius: 4px;
-  --olx-radius-card: 8px;
-  --olx-shadow: 0 1px 3px rgba(0, 47, 52, 0.08);
-  --olx-content-max: 1350px;
+  --olx-radius: 8px;
+  --olx-radius-sm: 8px;
+  --olx-radius-md: 12px;
+  --olx-radius-lg: 16px;
+  --olx-radius-card: 12px;
+  --olx-shadow: 0 1px 0 rgba(26, 26, 46, 0.06);
+  --olx-content-max: 1200px;
   --olx-content-padding: 24px;
   --olx-content-padding-mobile: 16px;
   --olx-breakpoint-sm: 480px;
   --olx-breakpoint-md: 768px;
   --olx-breakpoint-lg: 1200px;
+  --app-header-height: 68px;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --app-header-height: 100px;
+  }
+}
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--olx-text);
+  background: var(--olx-bg);
+  margin: 0;
 }
 
 * {

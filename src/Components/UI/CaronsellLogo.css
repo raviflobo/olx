@@ -1,0 +1,19 @@
+.cs-logo-link {
+  text-decoration: none;
+  display: inline-flex;
+}
+
+.cs-logo {
+  font-size: 1.375rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.cs-logo__caron {
+  color: var(--olx-primary);
+}
+
+.cs-logo__sell {
+  color: var(--olx-highlight);
+}

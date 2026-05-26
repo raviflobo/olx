@@ -9,12 +9,17 @@ import { Firebase } from './config';
 
 const auth = Firebase.auth();
 
+function appUrl(path) {
+  const base = process.env.PUBLIC_URL || '';
+  return `${window.location.origin}${base}${path}`;
+}
+
 // ─── Email verification ───────────────────────────────────────────────────
 export function sendEmailVerification() {
   const user = auth.currentUser;
   if (!user || user.emailVerified) return Promise.resolve();
   return user.sendEmailVerification({
-    url: window.location.origin + '/login',
+    url: appUrl('/dealer/login'),
     handleCodeInApp: false,
   });
 }
@@ -68,7 +73,7 @@ export function linkAnonymousWithCredential(credential) {
 // ─── Email link (passwordless) ─────────────────────────────────────────────
 export function sendSignInLinkToEmail(email, actionCodeSettings) {
   const settings = actionCodeSettings || {
-    url: window.location.origin + '/login',
+    url: appUrl('/dealer/login'),
     handleCodeInApp: true,
   };
   return auth.sendSignInLinkToEmail(email, settings);

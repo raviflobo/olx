@@ -1,0 +1,29 @@
+.privacy-page {
+  max-width: 720px;
+}
+
+.privacy-page h1 {
+  font-size: 1.75rem;
+  margin: 0 0 0.5rem;
+}
+
+.privacy-page__updated {
+  color: var(--olx-text-muted);
+  font-size: 0.875rem;
+  margin: 0 0 2rem;
+}
+
+.privacy-page section {
+  margin-bottom: 1.5rem;
+}
+
+.privacy-page h2 {
+  font-size: 1.125rem;
+  margin: 0 0 0.5rem;
+}
+
+.privacy-page p {
+  color: var(--olx-text);
+  line-height: 1.6;
+  margin: 0;
+}

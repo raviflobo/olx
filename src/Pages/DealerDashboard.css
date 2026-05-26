@@ -1,0 +1,39 @@
+.dealer-dashboard__head {
+  background: linear-gradient(135deg, var(--olx-primary) 0%, #2d2d44 100%);
+  color: #fff;
+  margin: 0 calc(-1 * var(--olx-content-padding-mobile)) 0;
+  padding: 0.875rem var(--olx-content-padding-mobile) 0.25rem;
+  border-radius: 0 0 var(--olx-radius-lg) var(--olx-radius-lg);
+}
+
+@media (min-width: 769px) {
+  .dealer-dashboard__head {
+    margin: 0 0 0.5rem;
+    border-radius: var(--olx-radius-lg);
+    padding: 1rem 1.5rem 0.25rem;
+  }
+}
+
+.dealer-dashboard__head .cs-page-header {
+  margin-bottom: 0.75rem;
+}
+
+.dealer-dashboard__head .cs-page-header__title {
+  color: #fff;
+}
+
+.dealer-dashboard__head .cs-btn--primary {
+  background: var(--olx-highlight);
+  color: var(--olx-primary);
+}
+
+.dealer-dashboard__head .cs-btn--primary:hover:not(:disabled) {
+  background: #f0d058;
+}
+
+.dealer-dashboard__links {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 1rem 0 1rem;
+}

@@ -1,13 +1,17 @@
 import React from 'react';
+import CaronsellLogo from '../UI/CaronsellLogo';
 import './barloading.css';
-const Logo = `${process.env.PUBLIC_URL || ''}/assets/images/olx-logo.png`;
 
-function BarLoading() {
+function BarLoading({ inline = false }) {
   return (
-    <div className="bar-loading">
+    <div
+      className={`bar-loading${inline ? ' bar-loading--inline' : ''}`}
+      role="status"
+      aria-label="Loading CARONSELL"
+    >
       <div className="bar-loading-inner">
-        <img src={Logo} alt="OLX" className="bar-loading-logo" />
-        <div className="bar-loading-shimmer" />
+        <CaronsellLogo asLink={false} className="bar-loading-logo" />
+        <div className="bar-loading-shimmer" aria-hidden="true" />
       </div>
     </div>
   );

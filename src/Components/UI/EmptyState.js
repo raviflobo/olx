@@ -1,12 +1,16 @@
 import React from 'react';
-import './EmptyState.css';
+import Button from './Button';
 
-function EmptyState({ title, message, action }) {
+function EmptyState({ title, text, actionLabel, onAction }) {
   return (
-    <div className="emptyState">
-      {title && <h3 className="emptyStateTitle">{title}</h3>}
-      {message && <p className="emptyStateMessage">{message}</p>}
-      {action && <div className="emptyStateAction">{action}</div>}
+    <div className="cs-empty">
+      <h3 className="cs-empty__title">{title}</h3>
+      {text && <p className="cs-empty__text">{text}</p>}
+      {actionLabel && onAction && (
+        <Button variant="primary" onClick={onAction}>
+          {actionLabel}
+        </Button>
+      )}
     </div>
   );
 }

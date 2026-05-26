@@ -1,100 +1,176 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { useHistory } from 'react-router-dom';
-import Banner from '../Components/Banner/Banner';
-import CategoryGrid from '../Components/Home/CategoryGrid';
-import LocationBanner from '../Components/Home/LocationBanner';
-import QuickMenu from '../Components/Home/QuickMenu';
+import React, { useEffect, useState, useMemo } from 'react';
+import { Link } from 'react-router-dom';
 import Layout from '../Components/Layout/Layout';
-import NearbyAds from '../Components/Location/NearbyAds';
-import Posts from '../Components/Posts/Posts';
-import { LocationContext } from '../contextStore/LocationContext';
-import { Firebase } from '../firebase/config';
-import { seededShuffle } from '../utils/seededShuffle';
+import CarCard from '../Components/UI/CarCard';
+import Chip from '../Components/UI/Chip';
+import SkeletonCard from '../Components/UI/SkeletonCard';
+import EmptyState from '../Components/UI/EmptyState';
+import { fetchPublicCars } from '../utils/fetchPublicCars';
+import { filterCars, uniqueValues } from '../utils/carFilters';
 import './Home.css';
 
-const QUICK_MENU_COUNT = 8;
-
-/**
- * Sort products by admin-assigned marketingScore (desc) then by createdAt (desc).
- * Products with a higher marketingScore appear first in the Quick Menu.
- * Products without a score default to 0 and fall back to chronological order.
- * The marketingScore field (0–100) is set by admins via Firebase Console.
- */
-function sortByMarketingScore(list) {
-  return [...list].sort((a, b) => {
-    const scoreA = Number(a.marketingScore) || 0;
-    const scoreB = Number(b.marketingScore) || 0;
-    if (scoreA !== scoreB) return scoreB - scoreA;
-    // Same score — newest first
-    const dateA = a.createdAt?.toDate
-      ? a.createdAt.toDate()
-      : new Date(a.createdAt || 0);
-    const dateB = b.createdAt?.toDate
-      ? b.createdAt.toDate()
-      : new Date(b.createdAt || 0);
-    return dateB - dateA;
-  });
-}
+const FILTERS = ['All', 'Brand', 'Fuel', 'City', 'Price'];
 
 function Home() {
-  const { browseLocation } = useContext(LocationContext);
-  const history = useHistory();
-  const [visitSeed] = useState(() => Date.now());
-  const [allProducts, setAllProducts] = useState([]);
-  const [productsLoading, setProductsLoading] = useState(true);
+  const [cars, setCars] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [activeFilter, setActiveFilter] = useState('All');
+  const [filterValue, setFilterValue] = useState({});
+  const [priceMin, setPriceMin] = useState('');
+  const [priceMax, setPriceMax] = useState('');
 
   useEffect(() => {
-    setProductsLoading(true);
-    Firebase.firestore()
-      .collection('products')
-      .where('status', '==', 'active')
-      .orderBy('createdAt', 'desc')
-      .get()
-      .then((snapshot) => {
-        const list = snapshot.docs.map((doc) => ({
-          ...doc.data(),
-          id: doc.id,
-        }));
-        setAllProducts(list);
-      })
-      .catch(() => setAllProducts([]))
-      .finally(() => setProductsLoading(false));
+    setLoading(true);
+    fetchPublicCars()
+      .then(setCars)
+      .catch(() => setCars([]))
+      .finally(() => setLoading(false));
   }, []);
 
-  // Quick Menu: top candidates by marketingScore, then time-seeded shuffle for variety per visit
-  const quickMenuProducts = seededShuffle(
-    sortByMarketingScore(allProducts).slice(0, QUICK_MENU_COUNT * 2),
-    visitSeed
-  ).slice(0, QUICK_MENU_COUNT);
+  const brands = useMemo(() => uniqueValues(cars, 'brand'), [cars]);
+  const cities = useMemo(() => uniqueValues(cars, 'city'), [cars]);
+  const fuels = useMemo(() => uniqueValues(cars, 'fuelType'), [cars]);
 
-  // Fresh Recommendations: time-seeded shuffle so order varies per visit
-  const freshProducts = seededShuffle(allProducts, visitSeed);
+  const filtered = useMemo(() => {
+    const f = { ...filterValue };
+    if (activeFilter === 'Price') {
+      f.priceMin = priceMin;
+      f.priceMax = priceMax;
+    }
+    return filterCars(cars, f);
+  }, [cars, filterValue, activeFilter, priceMin, priceMax]);
+
+  const handleChip = (name) => {
+    setActiveFilter(name);
+    if (name === 'All') setFilterValue({});
+  };
 
   return (
     <Layout>
-      <div className="homeParentDiv">
-        <LocationBanner />
-        <CategoryGrid
-          onSelectCategory={(name, id) =>
-            history.push(
-              id ? `/category/${id}` : `/search?q=${encodeURIComponent(name)}`
-            )
-          }
-        />
-        <Banner />
-        <QuickMenu products={quickMenuProducts} loading={productsLoading} />
-        <Posts
-          allPosts={allProducts}
-          freshPosts={freshProducts}
-          loading={productsLoading}
-        />
-        {browseLocation?.city && (
-          <NearbyAds
-            city={browseLocation.city}
-            state={browseLocation.state}
-            limit={8}
-          />
-        )}
+      <div className="cs-page home-page cs-page--flush-top">
+        <div className="cs-container">
+          <header className="home-page__hero">
+            <h1 className="home-page__hero-title">Find your next car</h1>
+            <p className="home-page__hero-sub">
+              Browse listings from trusted dealers. Contact via WhatsApp instantly.
+            </p>
+            {!loading && (
+              <span className="home-page__hero-count">
+                {filtered.length} car{filtered.length !== 1 ? 's' : ''} available
+              </span>
+            )}
+          </header>
+
+          <div className="home-page__section-head">
+            <h2 className="home-page__section-title">Browse listings</h2>
+          </div>
+
+          <div className="home-page__filters-sticky">
+          <div className="cs-chips-row">
+            {FILTERS.map((f) => (
+              <Chip
+                key={f}
+                label={f}
+                active={activeFilter === f}
+                onClick={() => handleChip(f)}
+              />
+            ))}
+          </div>
+
+          {activeFilter === 'Brand' && (
+            <div className="home-page__subchips cs-chips-row">
+              {brands.map((b) => (
+                <Chip
+                  key={b}
+                  label={b}
+                  active={filterValue.brand === b}
+                  onClick={() => setFilterValue({ brand: b })}
+                />
+              ))}
+            </div>
+          )}
+          {activeFilter === 'Fuel' && (
+            <div className="home-page__subchips cs-chips-row">
+              {fuels.map((f) => (
+                <Chip
+                  key={f}
+                  label={f}
+                  active={filterValue.fuelType === f}
+                  onClick={() => setFilterValue({ fuelType: f })}
+                />
+              ))}
+            </div>
+          )}
+          {activeFilter === 'City' && (
+            <div className="home-page__subchips cs-chips-row">
+              {cities.map((c) => (
+                <Chip
+                  key={c}
+                  label={c}
+                  active={filterValue.city === c}
+                  onClick={() => setFilterValue({ city: c })}
+                />
+              ))}
+            </div>
+          )}
+          {activeFilter === 'Price' && (
+            <div className="home-page__price-filter">
+              <input
+                className="cs-input"
+                type="number"
+                placeholder="Min ₹"
+                value={priceMin}
+                onChange={(e) => setPriceMin(e.target.value)}
+              />
+              <input
+                className="cs-input"
+                type="number"
+                placeholder="Max ₹"
+                value={priceMax}
+                onChange={(e) => setPriceMax(e.target.value)}
+              />
+            </div>
+          )}
+          </div>
+
+          {loading && (
+            <div className="cs-car-grid">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <SkeletonCard key={i} />
+              ))}
+            </div>
+          )}
+
+          {!loading && filtered.length === 0 && (
+            <EmptyState
+              title="No cars found"
+              text="Try adjusting your filters or check back later."
+              actionLabel={Object.keys(filterValue).length ? 'Clear filters' : undefined}
+              onAction={
+                Object.keys(filterValue).length
+                  ? () => {
+                      setFilterValue({});
+                      setActiveFilter('All');
+                      setPriceMin('');
+                      setPriceMax('');
+                    }
+                  : undefined
+              }
+            />
+          )}
+
+          {!loading && filtered.length > 0 && (
+            <div className="cs-car-grid">
+              {filtered.map((car) => (
+                <CarCard key={car.id} car={car} />
+              ))}
+            </div>
+          )}
+
+          <p className="home-page__dealer-link">
+            <Link to="/dealer/login">Dealer Login</Link>
+          </p>
+        </div>
       </div>
     </Layout>
   );

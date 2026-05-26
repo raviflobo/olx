@@ -42,7 +42,7 @@ function ForgotPassword() {
           <p>
             We sent a password reset link to <strong>{email}</strong>
           </p>
-          <Link to="/login">Back to Login</Link>
+          <Link to="/dealer/login">Back to Login</Link>
         </div>
       </div>
     );
@@ -72,7 +72,7 @@ function ForgotPassword() {
             {loading && <ButtonSpinner />}Send reset link
           </button>
         </form>
-        <Link to="/login">Back to Login</Link>
+        <Link to="/dealer/login">Back to Login</Link>
       </div>
     </div>
   );

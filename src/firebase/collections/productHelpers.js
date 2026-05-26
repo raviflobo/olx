@@ -1,132 +1,107 @@
 /**
- * Product collection helpers.
+ * CARONSELL product (car listing) helpers.
  */
-import {
-  DEFAULT_PRODUCT_LOCATION,
-  DEFAULT_PRODUCT_DELIVERY,
-  DEFAULT_PRODUCT_WARRANTY,
-  DEFAULT_PRODUCT_STATS,
-} from '../schema';
-import { productsRef } from './refs';
+import { db, productsRef, getProductRef } from './refs';
 import { serverTimestamp } from './fieldValues';
 
-export const getProductRef = (id) => productsRef().doc(id);
+export { getProductRef };
 
-export const getProductsQuery = (opts = {}) => {
-  let q = productsRef();
-  if (opts.status) q = q.where('status', '==', opts.status);
-  if (opts.category) q = q.where('category', '==', opts.category);
-  if (opts.userId) q = q.where('userId', '==', opts.userId);
-  if (opts.adType) q = q.where('adType', '==', opts.adType);
-  if (opts.moderationStatus) q = q.where('moderationStatus', '==', opts.moderationStatus);
-  if (opts.orderBy) {
-    q = q.orderBy(opts.orderBy.field, opts.orderBy.direction || 'desc');
-  } else {
-    q = q.orderBy('createdAt', 'desc');
-  }
-  if (opts.limit) q = q.limit(opts.limit);
-  if (opts.startAfter) q = q.startAfter(opts.startAfter);
-  return q;
-};
+export const getActiveCarsQuery = () =>
+  productsRef()
+    .where('isActive', '==', true)
+    .orderBy('createdAt', 'desc');
 
-export function slugFromTitle(name) {
-  if (!name || typeof name !== 'string') return '';
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .slice(0, 80);
-}
+export const getDealerCarsQuery = (dealerId) =>
+  productsRef()
+    .where('dealerId', '==', dealerId)
+    .orderBy('createdAt', 'desc');
 
-export function buildSearchKeywords(name, description = '', tags = []) {
-  const text = [name, description, ...tags].filter(Boolean).join(' ').toLowerCase();
-  const tokens = text
-    .replace(/[^a-z0-9\s]/g, ' ')
-    .split(/\s+/)
-    .filter((t) => t.length > 1);
-  return [...new Set(tokens)].slice(0, 50);
-}
-
-export function createProductDoc(data, seller = {}) {
-  const name = (data.name || '').trim();
-  const slug = slugFromTitle(name);
-  const searchKeywords = buildSearchKeywords(
-    name,
-    data.description || '',
-    data.tags || []
-  );
+export function buildCarDoc(data, dealer = {}) {
   const now = serverTimestamp();
   return {
-    name,
-    slug: slug || `ad-${Date.now()}`,
-    description: (data.description || '').trim(),
-    category: data.category || '',
-    subcategory: data.subcategory || '',
-    tags: Array.isArray(data.tags) ? data.tags : [],
-    price: typeof data.price === 'number' ? data.price : 0,
-    originalPrice: data.originalPrice ?? null,
-    discountPercentage: data.discountPercentage ?? null,
-    priceCurrency: data.priceCurrency || 'INR',
-    priceType: data.priceType || 'fixed',
-    negotiable: Boolean(data.negotiable),
-    adType: data.adType || 'for_sale',
+    dealerId: data.dealerId,
+    dealerName: data.dealerName || dealer.name || '',
+    dealershipName: data.dealershipName || dealer.dealershipName || '',
+    dealerWhatsapp: data.dealerWhatsapp || dealer.whatsappNumber || '',
+    title: (data.title || '').trim(),
+    brand: (data.brand || '').trim(),
+    model: (data.model || '').trim(),
+    year: Number(data.year) || 0,
+    price: Number(data.price) || 0,
+    mileage: Number(data.mileage) || 0,
+    fuelType: data.fuelType || '',
+    transmission: data.transmission || '',
     condition: data.condition || '',
-    listedBy: data.listedBy || '',
-    images: Array.isArray(data.images) ? data.images : [],
-    thumbnailUrl: data.thumbnailUrl || (data.images && data.images[0]) || '',
-    videoUrl: data.videoUrl || '',
-    url: data.url || (data.images && data.images[0]) || '',
-    userId: data.userId || '',
-    sellerName: seller.name || '',
-    sellerAvatar: seller.avatar || '',
-    sellerVerified: Boolean(seller.verified),
-    sellerBadgeLevel: seller.badgeLevel || 'new',
-    contactPreference: data.contactPreference || 'both',
-    location: data.location && typeof data.location === 'object'
-      ? { ...DEFAULT_PRODUCT_LOCATION(), ...data.location }
-      : DEFAULT_PRODUCT_LOCATION(),
-    delivery: data.delivery && typeof data.delivery === 'object'
-      ? { ...DEFAULT_PRODUCT_DELIVERY(), ...data.delivery }
-      : DEFAULT_PRODUCT_DELIVERY(),
-    warranty: data.warranty && typeof data.warranty === 'object'
-      ? { ...DEFAULT_PRODUCT_WARRANTY(), ...data.warranty }
-      : DEFAULT_PRODUCT_WARRANTY(),
-    returnPolicy: data.returnPolicy || 'no_returns',
-    paymentMethods: Array.isArray(data.paymentMethods) ? data.paymentMethods : [],
-    extra: data.extra && typeof data.extra === 'object' ? data.extra : {},
-    isFeatured: false,
-    isUrgent: false,
-    isPromoted: false,
-    promotionPlan: 'none',
-    promotionExpiry: null,
-    featuredUntil: null,
-    featuredRequestStatus: 'none',
-    featuredRequestedAt: null,
-    marketingScore: 0,
-    bumpedAt: null,
-    status: data.status || 'active',
-    moderationStatus: data.moderationStatus || 'pending',
-    moderationNote: '',
-    rejectionReason: '',
-    reportCount: 0,
-    flaggedAt: null,
-    stats: DEFAULT_PRODUCT_STATS(),
-    watchers: {},
-    seoTitle: data.seoTitle || name,
-    seoDescription: data.seoDescription || (data.description || '').slice(0, 160),
-    searchKeywords,
-    availableFrom: data.availableFrom ?? null,
-    expiresAt: data.expiresAt ?? null,
-    autoRenew: Boolean(data.autoRenew),
-    renewalCount: 0,
-    lastRenewedAt: null,
-    publishedAt: data.status === 'active' ? now : null,
-    soldAt: null,
-    soldTo: '',
-    soldPrice: null,
-    draftSavedAt: data.status === 'draft' ? now : null,
-    createdAt: now,
+    color: (data.color || '').trim(),
+    description: (data.description || '').trim(),
+    imageUrls: Array.isArray(data.imageUrls) ? data.imageUrls : [],
+    city: (data.city || '').trim(),
+    isActive: data.isActive !== false,
+    createdAt: data.createdAt || now,
     updatedAt: now,
   };
+}
+
+export async function createCarDoc(data, dealer = {}) {
+  const payload = buildCarDoc(data, dealer);
+  const ref = await productsRef().add(payload);
+  return ref.id;
+}
+
+export async function updateCarDoc(id, data, dealer = {}) {
+  const { createdAt: _c, ...rest } = data;
+  const payload = buildCarDoc(rest, dealer);
+  delete payload.createdAt;
+  await getProductRef(id).update(payload);
+}
+
+export async function deleteCarDoc(id) {
+  await getProductRef(id).delete();
+}
+
+export async function getCarById(id) {
+  const snap = await getProductRef(id).get();
+  if (!snap.exists) return null;
+  return { id: snap.id, ...snap.data() };
+}
+
+/** Fetch all listings for a dealer (new dealerId + legacy userId). */
+export async function fetchDealerListings(dealerId) {
+  const [byDealer, byUser] = await Promise.all([
+    getDealerCarsQuery(dealerId).get().catch(() => ({ docs: [] })),
+    productsRef()
+      .where('userId', '==', dealerId)
+      .orderBy('createdAt', 'desc')
+      .get()
+      .catch(() => ({ docs: [] })),
+  ]);
+  const seen = new Set();
+  const merged = [];
+  [...byDealer.docs, ...byUser.docs].forEach((doc) => {
+    if (seen.has(doc.id)) return;
+    seen.add(doc.id);
+    merged.push({ id: doc.id, ...doc.data() });
+  });
+  return merged;
+}
+
+/** Denormalize dealer profile onto all their listings. */
+export async function syncDealerToListings(dealerId, dealer) {
+  const listings = await fetchDealerListings(dealerId);
+  if (!listings.length) return 0;
+  const batch = db.batch();
+  const patch = {
+    dealerName: dealer.name || '',
+    dealershipName: dealer.dealershipName || '',
+    dealerWhatsapp: dealer.whatsappNumber || '',
+    updatedAt: serverTimestamp(),
+  };
+  listings.forEach((item) => {
+    const ref = getProductRef(item.id);
+    const updates = { ...patch };
+    if (!item.dealerId) updates.dealerId = dealerId;
+    batch.update(ref, updates);
+  });
+  await batch.commit();
+  return listings.length;
 }

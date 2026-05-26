@@ -1,8 +1,8 @@
 {
-  "short_name": "React App",
-  "name": "Create React App OLX",
+  "short_name": "CARONSELL",
+  "name": "CARONSELL — Car Marketplace",
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#1A1A2E",
+  "background_color": "#F5F5F5"
 }

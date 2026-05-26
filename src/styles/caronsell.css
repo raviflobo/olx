@@ -1,0 +1,377 @@
+/* CARONSELL design system utilities */
+
+.cs-container {
+  max-width: var(--olx-content-max);
+  margin: 0 auto;
+  padding: 0 var(--olx-content-padding-mobile);
+}
+
+@media (min-width: 768px) {
+  .cs-container {
+    padding: 0 var(--olx-content-padding);
+  }
+}
+
+.cs-page {
+  padding-top: 0;
+  padding-bottom: 100px;
+  min-height: 100vh;
+  background: var(--olx-bg);
+}
+
+@media (min-width: 769px) {
+  .cs-page {
+    padding-top: 1rem;
+  }
+}
+
+/* Sit flush under fixed header (no extra page top gap) */
+.cs-page--flush-top {
+  padding-top: 0;
+}
+
+@media (max-width: 768px) {
+  .cs-page--flush-top {
+    margin-top: 0;
+  }
+}
+
+.cs-section-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--olx-text);
+  margin: 0 0 1rem;
+}
+
+/* Buttons */
+.cs-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: var(--olx-touch-min);
+  padding: 0 1.25rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  font-family: inherit;
+  border-radius: var(--olx-radius-md);
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+  text-decoration: none;
+}
+
+.cs-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.cs-btn--primary {
+  background: var(--olx-primary);
+  color: #fff;
+}
+
+.cs-btn--primary:hover:not(:disabled) {
+  background: var(--olx-primary-hover);
+}
+
+.cs-btn--outline {
+  background: transparent;
+  color: var(--olx-primary);
+  border: 1.5px solid var(--olx-border);
+}
+
+.cs-btn--outline:hover:not(:disabled) {
+  border-color: var(--olx-primary);
+}
+
+.cs-btn--whatsapp {
+  background: var(--caronsell-whatsapp);
+  color: #fff;
+}
+
+.cs-btn--whatsapp:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+
+.cs-btn--ghost {
+  background: transparent;
+  color: var(--olx-text-muted);
+}
+
+.cs-btn--ghost:hover:not(:disabled) {
+  color: var(--olx-primary);
+}
+
+.cs-btn--danger {
+  background: var(--olx-error);
+  color: #fff;
+}
+
+.cs-btn--block {
+  width: 100%;
+}
+
+.cs-btn--sm {
+  min-height: 36px;
+  padding: 0 0.75rem;
+  font-size: 0.875rem;
+}
+
+.cs-btn--icon {
+  width: 44px;
+  padding: 0;
+  border-radius: 50%;
+}
+
+/* Chips */
+.cs-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: inherit;
+  border-radius: 999px;
+  border: 1.5px solid var(--olx-border);
+  background: var(--olx-surface);
+  color: var(--olx-text);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.cs-chip:hover {
+  border-color: var(--olx-primary);
+}
+
+.cs-chip--active {
+  background: var(--olx-primary);
+  border-color: var(--olx-primary);
+  color: #fff;
+}
+
+.cs-chips-row {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding: 0.75rem 0;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.cs-chips-row::-webkit-scrollbar {
+  display: none;
+}
+
+/* Form fields */
+.cs-field {
+  margin-bottom: 1rem;
+}
+
+.cs-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--olx-text);
+  margin-bottom: 0.375rem;
+}
+
+.cs-input,
+.cs-select,
+.cs-textarea {
+  width: 100%;
+  min-height: var(--olx-touch-min);
+  padding: 0.625rem 0.875rem;
+  font-size: 1rem;
+  font-family: inherit;
+  color: var(--olx-text);
+  background: var(--olx-surface);
+  border: 1.5px solid var(--olx-border);
+  border-radius: var(--olx-radius-sm);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.cs-textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.cs-input:focus,
+.cs-select:focus,
+.cs-textarea:focus {
+  outline: none;
+  border-color: var(--olx-highlight);
+  box-shadow: 0 0 0 3px rgba(232, 197, 71, 0.25);
+}
+
+.cs-input--error,
+.cs-select--error,
+.cs-textarea--error {
+  border-color: var(--olx-error);
+}
+
+.cs-error {
+  font-size: 0.8125rem;
+  color: var(--olx-error);
+  margin-top: 0.25rem;
+}
+
+/* Badge */
+.cs-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 999px;
+}
+
+.cs-badge--success {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.cs-badge--muted {
+  background: #f3f4f6;
+  color: var(--olx-text-muted);
+}
+
+.cs-badge--fuel {
+  background: rgba(26, 26, 46, 0.08);
+  color: var(--olx-primary);
+}
+
+/* Empty state */
+.cs-empty {
+  text-align: center;
+  padding: 3rem 1.5rem;
+}
+
+.cs-empty__title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--olx-text);
+  margin: 0 0 0.5rem;
+}
+
+.cs-empty__text {
+  color: var(--olx-text-muted);
+  margin: 0 0 1.5rem;
+}
+
+/* Page header */
+.cs-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.cs-page-header__title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--olx-text);
+  margin: 0;
+}
+
+/* Auth card */
+.cs-auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: var(--olx-bg);
+}
+
+.cs-auth-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--olx-surface);
+  border-radius: var(--olx-radius-lg);
+  box-shadow: var(--olx-card-shadow);
+  padding: 2rem;
+}
+
+/* Skeleton */
+@keyframes cs-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.cs-skeleton {
+  background: linear-gradient(
+    90deg,
+    #e5e7eb 25%,
+    #f3f4f6 50%,
+    #e5e7eb 75%
+  );
+  background-size: 200% 100%;
+  animation: cs-shimmer 1.2s infinite;
+  border-radius: var(--olx-radius-sm);
+}
+
+/* Car grid */
+.cs-car-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .cs-car-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Dealer list row */
+.cs-list-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--olx-surface);
+  border-radius: var(--olx-radius-md);
+  box-shadow: var(--olx-card-shadow);
+  margin-bottom: 0.75rem;
+}
+
+.cs-list-row__thumb {
+  width: 72px;
+  height: 54px;
+  object-fit: cover;
+  border-radius: var(--olx-radius-sm);
+  flex-shrink: 0;
+}
+
+.cs-list-row__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.cs-list-row__title {
+  font-weight: 600;
+  margin: 0 0 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cs-list-row__price {
+  font-weight: 700;
+  color: var(--olx-primary);
+  margin: 0;
+}
+
+.cs-list-row__actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}

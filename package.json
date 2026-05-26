@@ -1,5 +1,5 @@
 {
-  "name": "olx",
+  "name": "caronsell",
   "version": "0.1.0",
   "engines": {
     "node": "16.x"
@@ -9,23 +9,26 @@
     "email": "sijeeshmonbalan@gmail.com"
   },
   "private": true,
+  "homepage": "https://raviflobo.github.io/olx",
   "dependencies": {
     "firebase": "^9.1.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-helmet": "^6.1.0",
     "react-router-dom": "^5.3.0",
     "react-scripts": "4.0.3"
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "NODE_OPTIONS=--openssl-legacy-provider react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "deploy": "npm run build && firebase deploy",
     "deploy:hosting": "npm run build && firebase deploy --only hosting",
     "deploy:rules": "firebase deploy --only firestore:rules,storage",
+    "firebase": "firebase",
     "deploy:indexes": "firebase deploy --only firestore:indexes",
+    "predeploy": "npm run build",
+    "deploy:gh-pages": "gh-pages -d build",
     "format": "prettier --write \"src/**/*.{js,jsx,json,css,md}\"",
     "format:check": "prettier --check \"src/**/*.{js,jsx,json,css,md}\""
   },
@@ -51,6 +54,8 @@
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
+    "firebase-tools": "^13.35.1",
+    "gh-pages": "^6.3.0",
     "prettier": "^3.8.1",
     "web-vitals": "^1.1.2"
   }

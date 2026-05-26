@@ -1,157 +1,100 @@
-import React, { useContext, useState } from 'react';
-import { useHistory, useLocation, Link } from 'react-router-dom';
+import React, { useContext } from 'react';
+import { useHistory, useLocation } from 'react-router-dom';
 import './Header.css';
-import OlxLogo from '../../assets/OlxLogo';
-import SearchIcon from '../../assets/SearchIcon';
-import Arrow from '../../assets/Arrow';
-import SellButton from '../../assets/SellButton';
-import SellButtonPlus from '../../assets/SellButtonPlus';
+import CaronsellLogo from '../UI/CaronsellLogo';
 import { AuthContext } from '../../contextStore/AuthContext';
-import { useSearchFilter } from '../../hooks/useSearchFilter';
-import NotificationBell from '../Notifications/NotificationBell';
-import LocationDropdown from './LocationDropdown';
-import UserDropdown from './UserDropdown';
-import MobileMenu from './MobileMenu';
+import { getUserDoc } from '../../firebase/collections';
+import { signOut } from '../../firebase/auth';
 
 function Header() {
+  const headerRef = React.useRef(null);
   const history = useHistory();
   const location = useLocation();
   const { user } = useContext(AuthContext);
-  const loginState = { from: { pathname: location.pathname } };
-  const {
-    filteredData,
-    wordEntered,
-    isOpen,
-    wrapperRef,
-    handleFilter,
-    clearInput,
-    closeDropdown,
-    handleSelectedSearch,
-    handleKeyDown,
-  } = useSearchFilter();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isDealer, setIsDealer] = React.useState(false);
+  const [q, setQ] = React.useState('');
 
-  const handleSearchSubmit = () => {
-    if (wordEntered.trim()) {
-      history.push(`/search?q=${encodeURIComponent(wordEntered.trim())}`);
-    } else {
-      history.push('/search');
+  React.useEffect(() => {
+    const node = headerRef.current;
+    if (!node) return undefined;
+
+    const syncHeaderHeight = () => {
+      document.documentElement.style.setProperty(
+        '--app-header-height',
+        `${node.offsetHeight}px`
+      );
+    };
+
+    syncHeaderHeight();
+    const observer = new ResizeObserver(syncHeaderHeight);
+    observer.observe(node);
+    window.addEventListener('resize', syncHeaderHeight);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', syncHeaderHeight);
+    };
+  }, [user, isDealer]);
+
+  React.useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    setQ(params.get('q') || '');
+  }, [location.search]);
+
+  React.useEffect(() => {
+    if (!user) {
+      setIsDealer(false);
+      return;
     }
-    closeDropdown();
+    getUserDoc(user.uid).then((doc) => setIsDealer(doc?.role === 'dealer'));
+  }, [user]);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    const term = q.trim();
+    history.push(term ? `/search?q=${encodeURIComponent(term)}` : '/search');
   };
 
-  const handleEmptyClick = () => {
-    history.push('/search');
+  const handleLogout = () => {
+    signOut().then(() => history.push('/'));
   };
 
   return (
-    <div className="headerParentDiv">
-      <div className="headerChildDiv">
-        <button
-          type="button"
-          className="headerHamburger"
-          onClick={() => setMobileMenuOpen(true)}
-          aria-label="Open menu"
-        >
-          <span />
-          <span />
-          <span />
-        </button>
-        <Link to="/" className="brandName">
-          <OlxLogo />
-        </Link>
-        <div className="headerLocationWrap">
-          <LocationDropdown />
-        </div>
-        <div className="headerSearchWrap" ref={wrapperRef}>
-          <div className="headerSearchInner">
-            <input
-              type="text"
-              placeholder="Find Cars, Mobile Phones and more..."
-              value={wordEntered}
-              onChange={handleFilter}
-              onKeyDown={(e) => {
-                handleKeyDown(e);
-                if (e.key === 'Enter') handleSearchSubmit();
-              }}
-            />
-            {wordEntered.trim() && (
+    <header ref={headerRef} className="headerParentDiv">
+      <div className="headerChildDiv cs-container">
+        <CaronsellLogo />
+        <form className="headerSearchForm" onSubmit={handleSearch}>
+          <input
+            type="search"
+            className="headerSearchInput"
+            placeholder="Search cars…"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            aria-label="Search cars"
+          />
+        </form>
+        {user && (
+          <div className="headerAuthActions">
+            {isDealer && (
               <button
                 type="button"
-                className="headerClearBtn"
-                onClick={clearInput}
-                aria-label="Clear search"
+                className="headerDashboardBtn"
+                onClick={() => history.push('/dealer/dashboard')}
               >
-                &times;
+                Dashboard
               </button>
             )}
             <button
               type="button"
-              className="headerSearchBtn"
-              onClick={
-                wordEntered.trim() ? handleSearchSubmit : handleEmptyClick
-              }
-              aria-label="Search"
+              className="headerLogoutBtn"
+              onClick={handleLogout}
             >
-              <SearchIcon />
+              Log out
             </button>
           </div>
-          {isOpen && filteredData.length > 0 && (
-            <div className="dataResult-header">
-              {filteredData.slice(0, 15).map((value, key) => (
-                <div
-                  key={value.id || key}
-                  className="dataItem-header"
-                  role="button"
-                  tabIndex={0}
-                  onClick={() => handleSelectedSearch(value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      handleSelectedSearch(value);
-                    }
-                  }}
-                >
-                  <p>{value.name}</p>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-        <div className="headerLanguage">
-          <span>ENGLISH</span>
-          <Arrow />
-        </div>
-        <div className="headerRight">
-          {user ? (
-            <>
-              <NotificationBell />
-              <UserDropdown />
-            </>
-          ) : (
-            <Link
-              to={{ pathname: '/login', state: loginState }}
-              className="headerLoginLink"
-            >
-              Login
-            </Link>
-          )}
-        </div>
-        <Link to="/create" className="headerSellLink">
-          <div className="sellMenu">
-            <SellButton />
-            <div className="sellMenuContent">
-              <SellButtonPlus />
-              <span>SELL</span>
-            </div>
-          </div>
-        </Link>
+        )}
       </div>
-      <MobileMenu
-        open={mobileMenuOpen}
-        onClose={() => setMobileMenuOpen(false)}
-      />
-    </div>
+    </header>
   );
 }
 
