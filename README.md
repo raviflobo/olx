@@ -61,6 +61,8 @@ Live site: **https://raviflobo.github.io/olx/**
 
 ### One-time setup
 
+> **Seeing README instead of the app?** Pages is publishing the `main` branch source. Fix: open [Pages settings](https://github.com/raviflobo/olx/settings/pages) → **Build and deployment** → set **Source** to **GitHub Actions** (not “Deploy from a branch”). Then run the **Deploy to GitHub Pages** workflow under Actions, or run `npm run deploy:gh-pages` and set Source to branch **`gh-pages`** / **`/ (root)`**.
+
 1. In the repo on GitHub: **Settings → Pages → Build and deployment → Source** → **GitHub Actions**.
 2. Add repository **Secrets** (same names as `.env.example`):  
    `REACT_APP_FIREBASE_API_KEY`, `REACT_APP_FIREBASE_AUTH_DOMAIN`, `REACT_APP_FIREBASE_PROJECT_ID`, `REACT_APP_FIREBASE_STORAGE_BUCKET`, `REACT_APP_FIREBASE_MESSAGING_SENDER_ID`, `REACT_APP_FIREBASE_APP_ID` (and optional `REACT_APP_FIREBASE_MEASUREMENT_ID`).
